@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="author" title="Mason Freed" href="mailto:masonfreed@chromium.org">
+<link rel="help" href="https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#form-submission-algorithm">
+<link rel="match"  href="form-double-submit-ref.html">
+
+<!-- The onclick submit() should *not* get superceeded in this case by the
+     default action submit(), because onclick here returns false to prevent
+     the default submit().
+  -->
+
+<label for=frame2 style="display:block">This frame should stay blank</label>
+<iframe name=frame2 id=frame2></iframe>
+<label for=frame1 style="display:block">This frame should navigate (to 404)</label>
+<iframe name=frame1 id=frame1></iframe>
+<form id="form1" target="frame1" action="nonexistent.html">
+  <input id=submitbutton type=submit onclick="form1.submit();form1.target='frame2';return false;">
+</form>
+
+<script>
+  const e = new MouseEvent("click", { bubbles: false });
+  submitbutton.dispatchEvent(e);
+</script>

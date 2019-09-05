@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="author" title="Mason Freed" href="mailto:masonfreed@chromium.org">
+
+<label for=frame1 style="display:block">This frame should stay blank</label>
+<iframe name=frame1 id=frame1></iframe>
+<label for=frame2 style="display:block">This frame should navigate (to 404)</label>
+<iframe name=frame2 id=frame2 src="nonexistent.html"></iframe>
+<form id="form1">
+  <input type=submit>
+</form>
