@@ -19,13 +19,18 @@
 //
 // The behaviour of the tests should be _mostly_ identical, except that
 // Trusted Types relevant assignments should only throw in the enforced
-// case. We will use assert_throws for things that should always throw
-// (i.e., regular exceptions), and maybe_throws for tests that should only
-// throw in TT-enforcing mode.
+// case, but proceed in report-only case. We define two helpers, maybe_throws
+// and maybe_contains, whose behavious differs between enforcing and report-only
+// modes, so that we can write the appropraite assertions.
 const is_report_only = document.location.pathname.includes("report-only");
-const maybe_throws = (is_report_only
-  ? (error, fn, message) => fn()
-  : assert_throws);
+let maybe_throws = assert_throws;
+let maybe_contains;
+if (is_report_only) {
+  maybe_throws = (error, fn, message) => fn();
+  maybe_contains = (actual, expected) => assert_true(actual.includes(expected));
+} else {
+  maybe_contains = (actual, expected) => assert_equals(actual, "");
+}
 
 // Ensure that only the right events trigger violation reports.
 // The Promise will resolve, when an event including the string "done" is
@@ -70,6 +75,7 @@ testCases.forEach(c => {
   test(t => {
     const element = document.createElement(c[0]);
     maybe_throws(TypeError(), _ => element[c[1]] = "nodefault");
+    maybe_contains(element[c[1]], "nodefault");
   }, `${c[0]}.${c[1]} no default policy`);
 });
 
@@ -106,6 +112,7 @@ testCases.forEach(c => {
   test(t => {
     const element = document.createElement(c[0]);
     maybe_throws(TypeError(), _ => element[c[1]] = "null");
+    maybe_contains(element[c[1]], "null");
   }, name + "null");
   test(t => {
     const element = document.createElement(c[0]);
@@ -114,6 +121,7 @@ testCases.forEach(c => {
   test(t => {
     const element = document.createElement(c[0]);
     maybe_throws(TypeError(), _ => element[c[1]] = "undefined");
+    maybe_contains(element[c[1]], "undefined");
   }, name + "undefined");
   test(t => {
     const element = document.createElement(c[0]);
